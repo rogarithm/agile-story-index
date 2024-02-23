@@ -41,7 +41,6 @@ end
 result = "<html>
 	<head>
 		<meta charset=\"utf-8\">
-		<link rel=\"stylesheet\" href=\"./css/main.css\">
 	</head>
 	<body>
     #{index_content}
