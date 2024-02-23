@@ -27,7 +27,7 @@ index_page_urls.each do |index_page_url|
   doc = Nokogiri::HTML(index_page_per_month)
   doc.css(".POST_BODY > a").each do |post_info|
     title = post_info.content
-    link = post_info["href"]
+    link = "http://web.archive.org" << post_info["href"]
     posts_info.push(Post.new(title, link))
   end
 end
