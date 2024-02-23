@@ -1,9 +1,9 @@
 require 'json'
 
-raw = "2021년 03월\n2020년 05월"
+posted_at = "2021년 03월\n2020년 05월"
 
 partial_paths = []
-raw.split("\n").each do |ym|
+posted_at.split("\n").each do |ym|
   partial_paths.push(
     ym.sub("년", "")
     .sub("월", "")
@@ -11,10 +11,10 @@ raw.split("\n").each do |ym|
   )
 end
 
-response_jsons = []
+index_page_urls = []
 partial_paths.each do |partial_path|
-  response_json = `curl -X GET "https://archive.org/wayback/available?url=agile.egloos.com/archives/#{partial_path}"`
-  url_to_visit = JSON.parse(response_json)["archived_snapshots"]["closest"]["url"]
-  response_jsons.push(url_to_visit)
+  response_per_month = `curl -X GET "https://archive.org/wayback/available?url=agile.egloos.com/archives/#{partial_path}"`
+  index_url_per_month = JSON.parse(response_per_month)["archived_snapshots"]["closest"]["url"]
+  index_page_urls.push(index_url_per_month)
 end
 
