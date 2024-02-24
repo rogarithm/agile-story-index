@@ -8,4 +8,11 @@ describe IndexMaker do
     )
     expect(partial_path_list.first).to eq('2021/03')
   end
+
+  it "manipulates file content splitted by newline char" do
+    im = IndexMaker.new
+    index_page_urls = []
+    partial_paths = File.read(File.expand_path("../data/posted_at", File.dirname(__FILE__)))
+    expect(partial_paths.split("\n").first).to eq("2021/03")
+  end
 end
