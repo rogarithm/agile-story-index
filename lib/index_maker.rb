@@ -3,9 +3,14 @@ require 'nokogiri'
 require_relative './post'
 
 class IndexMaker
-  posted_at = "2021년 03월\n2020년 05월\n2020년 02월\n2019년 09월\n2018년 12월\n2018년 04월\n2018년 03월\n2018년 02월\n2017년 07월\n2017년 05월\n2017년 04월\n2017년 03월\n2016년 12월\n2016년 11월\n2016년 08월\n2016년 07월\n2015년 12월\n2015년 11월\n2015년 09월\n2015년 08월\n2015년 06월\n2015년 05월\n2015년 04월\n2015년 03월\n2015년 02월\n2014년 12월\n2014년 11월\n2014년 09월\n2014년 08월\n2014년 03월\n2014년 01월\n2013년 12월\n2013년 10월\n2013년 08월\n2013년 06월\n2013년 05월\n2013년 04월\n2013년 02월\n2012년 09월\n2012년 08월\n2012년 06월\n2012년 05월\n2012년 03월\n2011년 12월\n2011년 11월\n2011년 10월\n2011년 09월\n2011년 04월\n2011년 03월\n2011년 02월\n2011년 01월\n2010년 12월\n2010년 10월\n2010년 09월\n2010년 08월\n2010년 07월\n2010년 06월\n2010년 05월\n2010년 04월\n2010년 03월\n2010년 02월\n2010년 01월\n2009년 12월\n2009년 11월\n2009년 10월\n2009년 09월\n2009년 08월\n2009년 07월\n2009년 06월\n2009년 05월\n2009년 04월\n2009년 03월\n2009년 02월\n2009년 01월\n2008년 12월\n2008년 11월\n2008년 10월\n2008년 09월\n2008년 08월\n2008년 07월\n2008년 06월\n2008년 05월\n2008년 04월\n2008년 03월\n2008년 02월\n2008년 01월\n2007년 12월\n2007년 11월\n2007년 10월\n2007년 09월\n2007년 08월\n2007년 07월\n2007년 06월\n2007년 05월\n2007년 04월\n2007년 03월\n2007년 02월\n2007년 01월\n2006년 12월\n2006년 11월\n2006년 10월\n2006년 09월\n2006년 08월\n2006년 07월\n2006년 06월\n2006년 05월\n2006년 04월\n2006년 03월\n2006년 02월"
+  attr_reader :partial_paths
 
-  def make_partial_path_list posted_at
+  def initialize
+    make_partial_path_list(File.expand_path("../data/posted_at_raw", File.dirname(__FILE__))) if File.exist?(File.expand_path("../data/posted_at", File.dirname(__FILE__))) == false
+  end
+
+  def make_partial_path_list src
+    posted_at = File.read(src)
     partial_paths = []
     posted_at.split("\n").each do |ym|
       partial_paths.push(
@@ -14,7 +19,12 @@ class IndexMaker
         .sub(" ", "/")
       )
     end
-    partial_paths
+    File.open(File.expand_path("../data/posted_at", File.dirname(__FILE__)), 'w+') do |file|
+      partial_paths.each do |path|
+        file << path
+        file << "\n"
+      end
+    end
   end
 
   def make_url_list4index_page partial_paths
