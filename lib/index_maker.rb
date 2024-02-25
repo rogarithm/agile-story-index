@@ -10,7 +10,7 @@ class IndexMaker
   end
 
   def make_partial_path_list src
-    posted_at = File.read(src)
+    posted_at = File.read(File.expand_path(src, File.dirname(__FILE__)))
     partial_paths = []
     posted_at.split("\n").each do |ym|
       partial_paths.push(
