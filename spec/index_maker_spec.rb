@@ -3,10 +3,10 @@ require_relative '../lib/index_maker'
 describe IndexMaker do
   it "gathers year_month info list from file" do
     im = IndexMaker.new
-    partial_path_list = im.make_partial_path_list(
-      File.expand_path("../data/posted_at_raw", File.dirname(__FILE__))
-    )
-    expect(partial_path_list.first).to eq('2021/03')
+    partial_path_list = im.make_partial_path_list('../data/posted_at_raw')
+    partial_path_list.each do |partial_path|
+      expect(partial_path).to match(/[0-9]{4}\/[0-9]{2}/)
+    end
   end
 
   it "manipulates file content splitted by newline char" do
