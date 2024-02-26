@@ -5,19 +5,6 @@ require_relative './post'
 class IndexMaker
   attr_reader :partial_paths
 
-  def get_full_path src
-    File.expand_path(src, File.dirname(__FILE__))
-  end
-
-  def write_data data, to
-    File.open(get_full_path(to), 'w+') do |file|
-      data.each do |d|
-        file << d
-        file << "\n"
-      end
-    end
-  end
-
   def make_partial_path_list src
     posted_at = src
     partial_paths = []
