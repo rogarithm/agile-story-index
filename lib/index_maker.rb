@@ -29,6 +29,22 @@ class IndexMaker
     index_page_urls
   end
 
+  def take_in(data, range)
+    ends_at = data.length - 1
+    from = 0
+    to = range - 1
+    result = []
+    loop do
+      if from > ends_at
+        break
+      end
+      result.push(data.slice(from..to))
+      from += range
+      to += range
+    end
+    result
+  end
+
   def make_posts_info src
     index_page_urls = src
     posts_info = []

@@ -16,4 +16,15 @@ describe IndexMaker do
     partial_paths = File.read(File.expand_path("../data/posted_at", File.dirname(__FILE__)))
     expect(partial_paths.split("\n").first).to eq("2021/03")
   end
+
+  it "takes every x elements from input" do
+    im = IndexMaker.new
+    expect(im.take_in([1,2,3,4,5,6], 2)).to eq([[1,2], [3,4], [5,6]])
+  end
+
+  it "takes rest elements if remaining elements are smaller than x" do
+    im = IndexMaker.new
+    expect(im.take_in([1,2,3,4,5,6,7], 2)).to eq([[1,2], [3,4], [5,6], [7]])
+  end
+
 end
