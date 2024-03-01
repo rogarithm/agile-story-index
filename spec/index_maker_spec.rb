@@ -1,4 +1,5 @@
 require_relative '../lib/index_maker'
+require_relative '../lib/runner'
 
 describe IndexMaker do
   it "gathers year_month info list from file" do
@@ -27,4 +28,22 @@ describe IndexMaker do
     expect(im.take_in([1,2,3,4,5,6,7], 2)).to eq([[1,2], [3,4], [5,6], [7]])
   end
 
+  it "apply some logic to every x elements" do
+    im = IndexMaker.new
+    r = Runner.new
+    xs = im.take_in([1,2,3,4,5,6], 2)
+    xs.each do |x|
+      expect(x.length).to eq(2)
+      #x.each do |element|
+      #end
+    end
+  end
+
+  it "gather all post info per year/month" do
+    im = IndexMaker.new
+    r = Runner.new
+    posts_info = im.make_posts_info File.read(r.get_full_path "../data/index_page_urls_first_1")
+    index_content = im.collect_index_content(posts_info)
+    im.make_index_page(index_content)
+  end
 end
