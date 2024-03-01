@@ -63,6 +63,7 @@ class IndexMaker
       end
       sleep API_RATE_LIMIT_PER
     end
+    posts_info
   end
 
   def collect_index_content posts_info
