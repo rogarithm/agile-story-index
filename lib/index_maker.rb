@@ -3,6 +3,8 @@ require 'nokogiri'
 require_relative './post'
 
 class IndexMaker
+  API_RATE_LIMIT_PER = 1 * 70
+
   attr_reader :partial_paths
 
   def make_partial_path_list src
@@ -48,14 +50,18 @@ class IndexMaker
   def make_posts_info src
     index_page_urls = src
     posts_info = []
-    index_page_urls.split("\n").each do |index_page_url|
-      index_page_per_month = `curl -X GET "#{index_page_url}"`
-      doc = Nokogiri::HTML(index_page_per_month)
-      doc.css(".POST_BODY > a").each do |post_info|
-        title = post_info.content
-        link = "http://web.archive.org" << post_info["href"]
-        posts_info.push(Post.new(title, link))
+    every_15 = take_in(index_page_urls.split("\n"), 15)
+    every_15.each do |each_15|
+      each_15.each do |index_page_url|
+        index_page_per_month = `curl -X GET "#{index_page_url}"`
+        doc = Nokogiri::HTML(index_page_per_month)
+        doc.css(".POST_BODY > a").each do |post_info|
+          title = post_info.content
+          link = "http://web.archive.org" << post_info["href"]
+          posts_info.push(Post.new(title, link))
+        end
       end
+      sleep API_RATE_LIMIT_PER
     end
   end
 

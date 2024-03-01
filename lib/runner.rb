@@ -19,12 +19,15 @@ class Runner
   end
 
   def run
-    partial_paths = @im.make_partial_path_list File.read(get_full_path "../data/posted_at_raw")
-    write_data(partial_paths, "../data/posted_at")
+    #partial_paths = @im.make_partial_path_list File.read(get_full_path "../data/posted_at_raw")
+    #write_data(partial_paths, "../data/posted_at")
 
-    index_page_urls = @im.make_url_list4index_page File.read(get_full_path "../data/posted_at")
-    write_data(index_page_urls, "../data/index_page_urls")
+    #index_page_urls = @im.make_url_list4index_page File.read(get_full_path "../data/posted_at")
+    #write_data(index_page_urls, "../data/index_page_urls")
 
-    posts_info = @im.make_posts_info File.read(get_full_path "../data/index_page_urls_first_15")
+    posts_info = @im.make_posts_info File.read(get_full_path "../data/index_page_urls_first_30")
+    index_content = @im.collect_index_content(posts_info)
+    @im.make_index_page(index_content)
+
   end
 end
