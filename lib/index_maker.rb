@@ -51,7 +51,7 @@ class IndexMaker
     index_page_urls = src
     posts_info = []
     every_15 = take_in(index_page_urls.split("\n"), 15)
-    every_15.each do |each_15|
+    every_15.each.with_index do |each_15, index|
       each_15.each do |index_page_url|
         index_page_per_month = `curl -X GET "#{index_page_url}"`
         doc = Nokogiri::HTML(index_page_per_month)
@@ -61,7 +61,7 @@ class IndexMaker
           posts_info.push(Post.new(title, link))
         end
       end
-      sleep API_RATE_LIMIT_PER
+      sleep API_RATE_LIMIT_PER if index != every_15.length - 1
     end
     posts_info
   end
