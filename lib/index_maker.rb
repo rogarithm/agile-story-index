@@ -3,7 +3,7 @@ require 'nokogiri'
 require_relative './post'
 
 class IndexMaker
-  API_RATE_LIMIT_PER = 1 * 70
+  API_RATE_LIMIT_PER = 1 * 120
 
   attr_reader :partial_paths
 
