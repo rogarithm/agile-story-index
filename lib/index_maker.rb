@@ -60,8 +60,8 @@ class IndexMaker
           link = "http://web.archive.org" << post_info["href"]
           posts_info.push(Post.new(title, link))
         end
+        sleep API_RATE_LIMIT_PER / 10 if index != every_15.length - 1
       end
-      sleep API_RATE_LIMIT_PER if index != every_15.length - 1
     end
     posts_info
   end
