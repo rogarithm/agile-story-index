@@ -3,14 +3,12 @@ require 'nokogiri'
 require_relative './post'
 
 class IndexMaker
+  API_RATE_LIMIT_PER = 1 * 120
+
   attr_reader :partial_paths
 
-  def initialize
-    make_partial_path_list(File.expand_path("../data/posted_at_raw", File.dirname(__FILE__))) if File.exist?(File.expand_path("../data/posted_at", File.dirname(__FILE__))) == false
-  end
-
   def make_partial_path_list src
-    posted_at = File.read(File.expand_path(src, File.dirname(__FILE__)))
+    posted_at = src
     partial_paths = []
     posted_at.split("\n").each do |ym|
       partial_paths.push(
@@ -19,16 +17,11 @@ class IndexMaker
         .sub(" ", "/")
       )
     end
-    File.open(File.expand_path("../data/posted_at", File.dirname(__FILE__)), 'w+') do |file|
-      partial_paths.each do |path|
-        file << path
-        file << "\n"
-      end
-    end
+    partial_paths
   end
 
   def make_url_list4index_page src
-    partial_paths = File.read(File.expand_path(src, File.dirname(__FILE__)))
+    partial_paths = src
     index_page_urls = []
     partial_paths.split("\n").each do |partial_path|
       response_per_month = `curl -X GET "https://archive.org/wayback/available?url=agile.egloos.com/archives/#{partial_path}"`
@@ -36,33 +29,41 @@ class IndexMaker
       index_page_urls.push(index_url_per_month)
     end
     index_page_urls
-    File.open(File.expand_path("../data/index_page_urls", File.dirname(__FILE__)), 'w+') do |file|
-      index_page_urls.each do |url|
-        file << url
-        file << "\n"
+  end
+
+  def take_in(data, range)
+    ends_at = data.length - 1
+    from = 0
+    to = range - 1
+    result = []
+    loop do
+      if from > ends_at
+        break
       end
+      result.push(data.slice(from..to))
+      from += range
+      to += range
     end
+    result
   end
 
   def make_posts_info src
-    index_page_urls = File.read(File.expand_path(src, File.dirname(__FILE__)))
+    index_page_urls = src
     posts_info = []
-    index_page_urls.split("\n").each do |index_page_url|
-      index_page_per_month = `curl -X GET "#{index_page_url}"`
-      doc = Nokogiri::HTML(index_page_per_month)
-      doc.css(".POST_BODY > a").each do |post_info|
-        title = post_info.content
-        link = "http://web.archive.org" << post_info["href"]
-        posts_info.push(Post.new(title, link))
+    every_15 = take_in(index_page_urls.split("\n"), 15)
+    every_15.each.with_index do |each_15, index|
+      each_15.each do |index_page_url|
+        index_page_per_month = `curl -X GET "#{index_page_url}"`
+        doc = Nokogiri::HTML(index_page_per_month)
+        doc.css(".POST_BODY > a").each do |post_info|
+          title = post_info.content
+          link = "http://web.archive.org" << post_info["href"]
+          posts_info.push(Post.new(title, link))
+        end
+        sleep API_RATE_LIMIT_PER / 10 if index != every_15.length - 1
       end
     end
-    File.open(File.expand_path("../data/posts_info", File.dirname(__FILE__)), 'w+') do |file|
-      posts_info.each do |post_info|
-        file << post_info.to_html
-        file << "\n"
-      end
-    end
-    
+    posts_info
   end
 
   def collect_index_content posts_info

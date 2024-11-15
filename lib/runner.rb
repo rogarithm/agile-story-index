@@ -5,9 +5,29 @@ class Runner
     @im = IndexMaker.new
   end
 
+  def get_full_path src
+    File.expand_path(src, File.dirname(__FILE__))
+  end
+
+  def write_data data, to
+    File.open(get_full_path(to), 'w+') do |file|
+      data.each do |d|
+        file << d
+        file << "\n"
+      end
+    end
+  end
+
   def run
-    #@im.make_partial_path_list "../data/posted_at_raw"
-    #@im.make_url_list4index_page "../data/posted_at"
-    @im.make_posts_info "../data/index_page_urls_first_15"
+    #partial_paths = @im.make_partial_path_list File.read(get_full_path "../data/posted_at_raw")
+    #write_data(partial_paths, "../data/posted_at")
+
+    #index_page_urls = @im.make_url_list4index_page File.read(get_full_path "../data/posted_at")
+    #write_data(index_page_urls, "../data/index_page_urls")
+
+    posts_info = @im.make_posts_info File.read(get_full_path "../data/index_page_urls_first_30")
+    index_content = @im.collect_index_content(posts_info)
+    @im.make_index_page(index_content)
+
   end
 end
