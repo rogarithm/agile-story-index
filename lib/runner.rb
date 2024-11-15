@@ -25,7 +25,7 @@ class Runner
     #index_page_urls = @im.make_url_list4index_page File.read(get_full_path "../data/posted_at")
     #write_data(index_page_urls, "../data/index_page_urls")
 
-    posts_info = @im.make_posts_info File.read(get_full_path "../data/index_page_urls_first_30")
+    posts_info = @im.make_posts_info File.read(get_full_path "../data/index_page_urls")
     index_content = @im.collect_index_content(posts_info)
     @im.make_index_page(index_content)
 

@@ -23,11 +23,23 @@ class IndexMaker
   def make_url_list4index_page src
     partial_paths = src
     index_page_urls = []
-    partial_paths.split("\n").each do |partial_path|
-      response_per_month = `curl -X GET "https://archive.org/wayback/available?url=agile.egloos.com/archives/#{partial_path}"`
-      index_url_per_month = JSON.parse(response_per_month)["archived_snapshots"]["closest"]["url"]
-      index_page_urls.push(index_url_per_month)
+    unable_to_get_urls = []
+    every_15 = take_in(partial_paths.split("\n"), 15)
+    every_15.each.with_index do |each_15, index|
+      each_15.each do |partial_path|
+        response_per_month = `curl -X GET "https://archive.org/wayback/available?url=agile.egloos.com/archives/#{partial_path}"`
+        if JSON.parse(response_per_month)["archived_snapshots"] != {}
+          index_url_per_month = JSON.parse(response_per_month)["archived_snapshots"]["closest"]["url"]
+          index_page_urls.push(index_url_per_month)
+        else
+          retry_req = `curl -X GET "https://archive.org/wayback/available?url=agile.egloos.com/archives/#{partial_path}"`
+          index_page_urls.push(JSON.parse(retry_req)["archived_snapshots"]["closest"]["url"]) if JSON.parse(retry_req)["archived_snapshots"] != {}
+          unable_to_get_urls << partial_path
+        end
+      end
+      sleep API_RATE_LIMIT_PER / 10 if index != every_15.length - 1
     end
+    p unable_to_get_urls
     index_page_urls
   end
 
